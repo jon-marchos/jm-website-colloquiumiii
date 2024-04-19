@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatter Plot with D3.js</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-contour@2"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        .contour-0, .contour-1, .contour-2 {
+            opacity: 0.3;
+        }
+        .contour-0:hover, .contour-1:hover, .contour-2:hover {
+            opacity: 0.8;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+        }
+        .cloud-info {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-family: 'Helvetica', sans-serif;
+            font-size: 24px; /* Increase font size */
+            max-width: 300px; /* Limit width */
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px; /* Increase padding */
+            border: 1px solid #fff;
+            display: none;
+        }
+        .axis text {
+            font-family: 'Helvetica', sans-serif; /* Set font for axis labels */
+            font-size: 14px; /* Set font size for axis labels */
+        }
+    </style>
+</head>
+<body>
+    <svg id="scatterplot"></svg>
+
+    <div class="tooltip"></div>
+    <div class="cloud-info" id="cloud-info"></div>
+
+    <script>
+        // Load GeoJSON data
+        d3.json("Neighborhoods_Editedv2.geojson").then(function(data) {
+            // Size of SVG
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+
+            // Margins
+            var margin = { top: 40, right: 20, bottom: 60, left: 60 };
+            var xOffset = 0.1; // Offset percentage for x-axis
+            var yOffset = 0.05; // Offset percentage for y-axis
+
+            // Create SVG element
+            var svg = d3.select("#scatterplot")
+                        .attr("width", width)
+                        .attr("height", height);
+
+            // Calculate x-axis minimum value with offset
+            var xMinValue = d3.min(data.features, function(d) { 
+                return d.properties.rentburden; 
+            });
+            var xOffsetValue = xMinValue * xOffset;
+
+            // Define color scale
+            var colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
+                               .domain(d3.extent(data.features, function(d) { 
+                                   return d.properties.averagemedianincome; 
+                               }));
+
+            // Define radius scale
+            var radiusScale = d3.scaleSqrt()
+                                .domain(d3.extent(data.features, function(d) {
+                                    return d.properties.averagemedianincome;
+                                }))
+                                .range([10, 1]);
+
+            // Scales
+            var xScale = d3.scaleLinear()
+                           .domain([xMinValue - xOffsetValue, d3.max(data.features, function(d) { 
+                               return d.properties.rentburden; 
+                           })])
+                           .range([margin.left, width - margin.right]);
+
+            var yScale = d3.scaleLinear()
+                           .domain([0, d3.max(data.features, function(d) { 
+                               return d.properties.foodburden; 
+                           })])
+                           .range([height - margin.bottom, margin.top]);
+
+            // Filter data points by economicindex
+            var economicindex0Data = data.features.filter(function(d) { return d.properties.economicindex === 0; });
+            var economicindex1Data = data.features.filter(function(d) { return d.properties.economicindex === 1; });
+            var economicindex2Data = data.features.filter(function(d) { return d.properties.economicindex === 2; });
+
+            // Generate contours for economicindex 0
+            var contours0 = d3.contourDensity()
+                              .x(function(d) { return xScale(d.properties.rentburden); })
+                              .y(function(d) { return yScale(d.properties.foodburden); })
+                              .size([width, height])
+                              .bandwidth(25)
+                              (economicindex0Data);
+
+            // Generate contours for economicindex 1
+            var contours1 = d3.contourDensity()
+                              .x(function(d) { return xScale(d.properties.rentburden); })
+                              .y(function(d) { return yScale(d.properties.foodburden); })
+                              .size([width, height])
+                              .bandwidth(25)
+                              (economicindex1Data);
+
+            // Generate contours for economicindex 2
+            var contours2 = d3.contourDensity()
+                              .x(function(d) { return xScale(d.properties.rentburden); })
+                              .y(function(d) { return yScale(d.properties.foodburden); })
+                              .size([width, height])
+                              .bandwidth(25)
+                              (economicindex2Data);
+
+                              // Randomly select 10 points
+    var randomPoints = [];
+    var numRandomPoints = 10;
+    var featuresCopy = data.features.slice(); // Create a copy of the features array
+
+    // Shuffle the features array
+    featuresCopy.sort(() => Math.random() - 0.5);
+
+    // Pick the first 10 shuffled points
+    for (var i = 0; i < numRandomPoints; i++) {
+        randomPoints.push(featuresCopy[i]);
+    }
+
+            // // Draw contours for economicindex 0
+            // svg.selectAll(".contour-0")
+            //    .data(contours0)
+            //    .enter().append("path")
+            //    .attr("class", "contour-0")
+            //    .attr("d", d3.geoPath())
+            //    .attr("fill", "lightblue");
+
+            // Draw contours for economicindex 1
+            svg.selectAll(".contour-1")
+               .data(contours1)
+               .enter().append("path")
+               .attr("class", "contour-1")
+               .attr("d", d3.geoPath())
+               .attr("fill", "pink");
+
+            // // Draw contours for economicindex 2
+            // svg.selectAll(".contour-2")
+            //    .data(contours2)
+            //    .enter().append("path")
+            //    .attr("class", "contour-2")
+            //    .attr("d", d3.geoPath())
+            //    .attr("fill", "pink");
+
+            // Draw circles for each data point
+            svg.selectAll("circle")
+               .data(data.features)
+               .enter()
+               .append("circle")
+               .attr("cx", function(d) { 
+                   return xScale(d.properties.rentburden); 
+               })
+               .attr("cy", function(d) { 
+                   return yScale(d.properties.foodburden); 
+               })
+               .attr("r", function(d) { 
+                   return radiusScale(d.properties.averagemedianincome); // Scale based on averagemedianincome
+               })
+               .attr("fill", function(d) { 
+                   return colorScale(d.properties.averagemedianincome); 
+               })
+               .on("mouseover", function(event, d) {
+                   var tooltip = d3.select(".tooltip");
+                   tooltip.style("display", "block")
+                          .style("left", (event.pageX + 10) + "px")
+                          .style("top", (event.pageY - 10) + "px")
+                          .html("<strong>NTA Name:</strong> " + d.properties.NTAName + "<br>" +
+                                "<strong>Average Median Income:</strong> " + d.properties.averagemedianincome + "<br>" +
+                                "<strong>Supermarket Count:</strong> " + d.properties.foodburden + "<br>" +
+                                "<strong>Vehicle Ratio:</strong> " + d.properties.vehicleratio);
+               })
+               .on("mouseout", function() {
+                   d3.select(".tooltip").style("display", "none");
+               });
+
+            // X-axis
+            var xAxis = d3.axisBottom(xScale);
+            svg.append("g")
+               .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+               .call(xAxis)
+               .selectAll("text")
+               .attr("dy", "0.5em")
+               .attr("dx", "0.5em")
+               .style("text-anchor", "start");
+
+            // Y-axis
+            var yAxis = d3.axisLeft(yScale);
+            svg.append("g")
+               .attr("transform", "translate(" + margin.left + ",0)")
+               .call(yAxis);
+
+            // X-axis label
+            svg.append("text")
+               .attr("transform", "translate(" + (width / 2) + " ," + (height - margin.bottom / 4) + ")")
+               .style("text-anchor", "middle")
+               .style("font-family", "'Helvetica', sans-serif")
+               .text("Vehicle Prevalence / Population");
+
+            // Y-axis label
+            svg.append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", margin.left / 4)
+               .attr("x", 0 - (height / 2))
+               .attr("dy", "1em")
+               .style("text-anchor", "middle")
+               .style("font-family", "'Helvetica', sans-serif")
+               .text("Supermarket Count");
+            
+                   // Draw red dashed line at x = 0.30
+            svg.append("line")
+            .attr("x1", xScale(0.30))
+            .attr("y1", margin.top)
+            .attr("x2", xScale(0.30))
+            .attr("y2", height - margin.bottom)
+            .attr("stroke", "red")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "4");
+
+            // Draw red dashed line at y = 0.10
+            svg.append("line")
+            .attr("x1", margin.left)
+            .attr("y1", yScale(0.10))
+            .attr("x2", width - margin.right)
+            .attr("y2", yScale(0.10))
+            .attr("stroke", "red")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "4");
+
+            // Add interactivity
+            svg.selectAll('.contour-0, .contour-1, .contour-2').on('mouseover', function(event, d) {
+                var economicindex = d3.select(this).attr("class").split("-")[1];
+                svg.selectAll('.contour-0, .contour-1, .contour-2').style('opacity', function() {
+                    return d3.select(this).attr('class').includes(economicindex) ? 0.8 : 0.3;
+                });
+                var cloudInfo = d3.select("#cloud-info");
+                switch (economicindex) {
+                    case "0":
+                        cloudInfo.html("Case 1: Though there are not many supermarkets within the area, this is compensated by having access to a vehicle");
+                        break;
+                    case "1":
+                        cloudInfo.html("Case 2: Though there is lower personal vehicle access, the amount of supermarkets present in the area make it manageable to get to");
+                        break;
+                    case "2":
+                        cloudInfo.html("Case 3: As a result of lower vehicle access and supermarket counts, it is harder to access supermarkets for individuals in these neighborhoods");
+                        break;
+                    default:
+                        cloudInfo.html("");
+                }
+                cloudInfo.style("display", "block");
+            }).on('mouseout', function() {
+                svg.selectAll('.contour-0, .contour-1, .contour-2').style('opacity', 0.3);
+                d3.select("#cloud-info").style("display", "none");
+            });
+
+                // Display NTAName for randomly selected points
+        // Display NTAName for randomly selected points with limit of 2 callouts per region
+        randomPoints.forEach(function(d) {
+        // Add spacing between point and callout
+        var spacing = 10;
+
+        // Check the region of the point
+        var economicindex = d.properties.economicindex;
+
+           // Track the number of callouts made from each contour region
+    var calloutsPerRegion = {
+        "0": 0,
+        "1": 0,
+        "2": 0
+    };
+
+
+        // Limit to 2 callouts per region
+        if (calloutsPerRegion[economicindex] < 2) {
+            svg.append("text")
+               .attr("x", xScale(d.properties.rentburden) + spacing) // Adjust x position
+               .attr("y", yScale(d.properties.foodburden) - spacing) // Adjust y position
+               .text(d.properties.NTAName)
+               .style("font-family", "'Helvetica', sans-serif")
+               .style("font-size", "12px")
+               .style("fill", "black");
+
+            calloutsPerRegion[economicindex]++;
+        }
+    });
+        }).catch(function(error) {
+            console.log(error);
+        });
+    </script>
+</body>
+</html>

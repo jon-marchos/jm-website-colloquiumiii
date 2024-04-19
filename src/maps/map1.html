@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js NYC Neighborhood Map</title>
+    <style>
+        path {
+            stroke: black; /* Outline color */
+            stroke-width: 0.5px;
+        }
+
+        .neighborhood-list {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            list-style-type: none;
+            padding: 0;
+            font-size: 2px; /* Extremely small text size */
+        }
+
+        .neighborhood-list-item {
+            margin-bottom: 0.15px; /* Adjust if needed */
+        }
+
+        .red-text {
+            color: red;
+            font-size: 2px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .black-text {
+            color: black;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 1.75px; /* Consistent with extremely small text size */
+        }
+
+    </style>
+</head>
+<body>
+    <ul class="neighborhood-list"></ul>
+    <svg id="map" width="800" height="600"></svg>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        var svg = d3.select("#map"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+
+        var projection = d3.geoMercator()
+            .center([-74.006, 40.7128]) // NYC coordinates
+            .scale(60000)
+            .translate([width / 2, height / 2]);
+
+        var path = d3.geoPath().projection(projection);
+
+        d3.json("Neighborhoods_Edited.geojson").then(function(data) {
+            svg.selectAll("path")
+                .data(data.features)
+                .enter().append("path")
+                .attr("d", path)
+                .style("stroke", "black")
+                .style("fill", function(d) {
+                    return d.properties.averagemedianincome < 33714 ? "rgba(255, 0, 0, 0.25)" : "none";
+                });
+
+            var neighborhoodList = d3.select(".neighborhood-list")
+                .selectAll("li")
+                .data(data.features)
+                .enter().append("li")
+                .attr("id", function(d, i) { return "li-" + i; })
+                .attr("class", function(d) {
+                    return "neighborhood-list-item " + 
+                        (d.properties.averagemedianincome < 33714 ? "red-text" : "black-text");
+                })
+                .text(function(d) { return d.properties.NTAName; });
+
+            var svgRect = svg.node().getBoundingClientRect();
+
+            data.features.forEach(function(d, i) {
+                if (d.properties.averagemedianincome < 33714) {
+                    var centroid = path.centroid(d);
+                    var liElement = document.getElementById("li-" + i);
+                    var liRect = liElement.getBoundingClientRect();
+                    
+                    var lineStartY = liRect.top - svgRect.top + (liRect.height / 2);
+
+                    svg.append("line")
+                        .style("stroke", "gray")
+                        .style("stroke-width", 0.25)
+                        .attr("x1", 10) // Adjust based on the list's position
+                        .attr("y1", lineStartY)
+                        .attr("x2", centroid[0])
+                        .attr("y2", centroid[1]);
+                }
+            });
+        // Create a scale for the population to control the height of the triangles
+        // Assuming population values range from 1000 to 100000 for scaling
+        var populationHeightScale = d3.scaleLinear()
+            .domain([1000, 100000]) // Adjust based on actual population range
+            .range([5, 50]); // Height range in pixels
+
+        data.features.forEach(function(d) {
+            if (d.properties.averagemedianincome < 33714) {
+                var centroid = path.centroid(d);
+                var population = d.properties.population;
+                var height = populationHeightScale(population)*2; // Scale the population value to determine height
+
+                // Width of the triangle is constant, but height varies with population
+                var halfWidth = 3; // Half the width of the base of the triangle
+                var points = [
+                    [centroid[0] - halfWidth, centroid[1]], // Bottom left
+                    [centroid[0] + halfWidth, centroid[1]], // Bottom right
+                    [centroid[0], centroid[1] - height] // Top point, height determines how "tall" the triangle is
+                ].join(" ");
+
+                svg.append("polygon")
+                    .attr("points", points)
+                    .style("fill", "red") // Set the fill color of triangles
+                    .style("opacity", 0.75); // Set the opacity to 0.5
+            }
+        });
+
+        
+    }).catch(function(error) {
+        console.log("Error loading GeoJSON data: " + error);
+    });
+
+    
+    </script>
+</body>
+</html>
