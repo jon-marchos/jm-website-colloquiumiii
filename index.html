@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BITING THE BIG APPLE</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="module" crossorigin src="/assets/index-DUHHHi-m.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D4cdmwoV.css">
+  </head>
+  <body>
+    <div class="columns">
+      <div class="column"></div>
+      <div class="column spacer-large">
+        <h1><b>BITING THE BIG APPLE 🍎</b></h1>
+        <div class="column spacer-large-desc">
+          <h2>An investigation into NYC's food <s>desert</s> <s>swamp</s> insecurity problem</h2><br>
+          <h2>Jonathan Marcos - Colloquium III</h2>
+        </div>
+        <br>
+      </div>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column last">
+        <!-- <div id="map" class="spacer"></div> -->
+        <!-- <div id="map2" class="spacer">
+          <script type="module" src="map1.js"></script>
+        </div> -->
+        <!-- <figure id="photo">
+          <img src="/bridge.jpg" alt="The Brooklyn Bridge in fog" />
+          <figcaption>©Ferdinando Scianna / Magnum Photos</figcaption>
+        </figure> -->
+                <figure id="photo">
+          <div style="width: 850px; height: 650px; overflow: hidden;">
+            <iframe src="./maps/map1.html" style="width: 100%; height: 100%; border: none; transform: scale(0.9); transform-origin: 0 0;"></iframe>
+          </div>
+        </figure>
+        <div class="spacer-large-desc">
+          <p>KEY: 🔴: Neighborhoods making lower than 33,714 USD, 🔺: Population. Taller spikes correlates to greater population</p>
+          <p>82 neighborhoods, encompassing 650000+ people, make average incomes less than 33,714. This exceeds<br>
+            the populations of cities such as Boston and Detroit.
+          </p>
+
+        </div>
+        </div>
+      <div class="column first">
+        <div class="spacer">
+          <div class="spacer-header">
+            <b>ABSTRACT:</b>
+          </div>
+          <p>
+            The USDA recommends that individuals spend at<br>
+            least 280.95 a month on average to afford<br>
+            economic, healthy meals. Per USDA statistics,<br>
+            10% of a household’s salary should be<br>
+            invested in order to purchase these meals<br>
+            comfortably, estimating that an income of<br>
+            33,714 USD is necessary.
+          </p>
+          <p>
+            In the context of New York City, 82<br>
+            neighborhoods make an average median income<br>
+            less than this threshold. This encompasses 650<br>
+            thousand people around the city, slightly over<br>
+            the populations of Boston and Detroit. Food<br>
+            insecurity makes individuals more prone to<br>
+            malnutrition, resulting in increased risks<br>
+            of high blood pressure, diabetes and other<br>
+            diet-related health problems.  
+          </p>
+          <p>
+            Admittedly, this only scratches the surface–<br>
+            there are far more variables that encompass<br>
+            what makes a neighborhood food insecure.<br>
+            <i>Biting the Big Apple</i> will go through a<br>
+            comprehensive deep dive of New York City’s food<br>
+            insecurity, elaborating what food insecurity is<br>
+            in the context of NYC, where food insecurity is<br>
+            most prevalent, why it is important to address<br>
+            food insecurity, what does food insecurity look<br>
+            like, and how food insecurity can be tackled<br>
+            throughout the city.
+          </p>
+        </div>
+        <!-- <canvas id="qr" class="spacer">
+        </canvas> -->
+        <br>
+        <br>
+        <br>
+    </div>
+    </div>
+    <div class = "columns">
+      <div class = "column first">
+          <div class="spacer-header">
+        <br>
+        <br>
+        <b>01: WHAT IS FOOD INSECURITY</b>
+      </div>
+      <p>
+        Food insecurity is the inability to comfortably<br>
+        access affordable, healthy dietary options.<br>
+        In the context of New York City, it takes two forms:<br>
+        <li><b>Food Desert: </b>Areas that have both poor<br>
+        proximity to healthy food options and also<br>
+        cannot afford it </li><br>
+        <li><b>Food Swamp: </b> Areas that have good<br>
+        physical proximity to healthy food options,<br>
+        but populace has difficulty affording it</li><br>
+        On the contrary, there's also:<br>
+        <br>
+        <li><b>Food Oasis: </b>Areas that have good physical<br>
+        proximity to healthy food options and where populace<br>
+        can afford it</li><br>
+
+      </p>
+      <p>
+        In incumbent investigations by the USDA, food insecurity<br>
+        is mostly emphasized by the lack of physical proximity<br>
+        (10 mile radius) to a supermarket. However, since NYC<br>
+        is so dense, the term "food swamp" must be used to discuss the<br>
+        lack of economical access to healthier options. In order<br>
+        to truly discuss which neighborhoods are riddled with<br>
+        food insecurity, various investigations and correlations<br>
+        of data such as income, supermarket and bodega counts,<br>
+        median rent and vehicle counts are all correlated to<br>
+        paint NYC's food insecurity landscape<br>
+      </p>
+      </div>
+      <div class = "column last">
+        <div class="spacer">
+          <div class="image-container">
+            <img src="/neighborhoodcomparison.jpg" alt="Your Image">
+          </div>
+          <div class="spacer-large-desc">
+            <p>Matrix of street views showing a food desert (left), swamp (center) and oasis (right).<br>
+              Though this will be looked into further, this gives an idea of infrastructural differences<br>
+              between the three environments.
+            </p>
+        </div>
+        <div class="image-container">
+          <img src="/USDATable.jpeg" alt="idk">
+        </div>
+        <div class="spacer-large-desc">
+          <p>USDA Table showing recommended costs for healthy, nutritious meals per person.
+          </p>
+      </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="background-frame">
+      <iframe src="./graphs/graph2.html" style="width: 100%; height: 100vh; border: none;"></iframe>
+  </div> -->
+
+  <div class="content-overlay">
+      <div class="columns">
+        <div class="column first">
+          <div class="spacer-header">
+            <p><b>2A: DEEPER FINANCIAL BURDENS</b></p>
+          </div>
+          <div class="spacer">
+            <p>Though the 33,714 USD cutoff for affording healthy<br>
+            meals is a good indicator for understanding neighborhoods<br>
+            with financial difficulties, it could also be justified<br>
+            with another financial parameter-- rent. According to<br>
+            many major financial institutions, such as SoFi and<br>
+            Chase, it is recommended that families should invest<br>
+            more than 30% of their income towards rent/mortgage<br>
+            in order to be financially sound.</p>
+            <br>
+            <p>In this particular graph, there is a comparison between<br>
+            the %of income that goes towards food, and the %of income<br>
+            that goes towards rent, with the dashed red lines<br>
+            representing the recommended financial cutoffs. Neighborhoods<br>
+            that exceed both of these cutoffs are prime candidates<br>
+            that are more vulnerable to food insecurity. In this case,<br>
+            these neighborhoods get a distinction gives them more priority<br>
+            when it comes to classifying which neighborhoods suffer<br>
+            from food insecurity the most.</p>
+          </div>
+        </div>
+        <div class="column last">
+          <!-- additional content can go here -->
+        </div>
+      </div>
+  </div>
+    <div class="columns">
+        <iframe src="./graphs/graph2.html" style="width: 100%; height: 800px; border: none; transform: scale(1); transform-origin: 0 0;"></iframe>
+    </div>
+    <div class="columns">
+      <br>
+      <br>
+      <iframe src="./graphs/graph.html" style="width: 100%; height: 800px; border: none; transform: scale(1); transform-origin: 0 0;"></iframe>
+  </div>
+  <div class="columns">
+    <br>
+    <br>
+    <iframe src="./graphs/graph3.html" style="width: 100%; height: 800px; border: none; transform: scale(1); transform-origin: 0 0;"></iframe>
+</div>
+<div class="columns">
+  <br>
+  <br>
+  <iframe src="./graphs/graph4.html" style="width: 100%; height: 800px; border: none; transform: scale(1); transform-origin: 0 0;"></iframe>
+</div>
+
+    <div class="columns">
+      <div class="column-quarter">
+        <div class="spacer-header">
+          <br>
+          <br>
+          <b>04: WHAT DOES FOOD INSECURITY<br>
+            LOOK LIKE?</b>
+        </div>
+        <div class="spacer">
+          <p>Ideally, neighborhoods should have<br>
+            infrastructure that allows for<br>
+            adequeate access to healthy food<br>
+            options. However, in the case of<br>
+            places with food insecurity, there<br>
+            are holes in the infrastructure<br>
+            that give food insecure places<br>
+            their classification.<br>
+            <br>
+            Within this investigation, a food<br>
+            oasis is used as a control group<br>
+            and is compared to other food<br>
+            insecure neighborhoods in order<br>
+            to show the qualitative differences<br>
+            and contrasts between infrastructure.<br>
+            <br>
+            Using google street imagery, a<br>
+            rough panorama is stitched together.<br>
+            All these captures are taken every 10<br>
+            meters, and all represent the same<br>
+            distance. 
+          </p>
+        </div>
+      </div>
+      <div class="column-three-quarters">
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="spacer">
+          <div class="panorama-container">
+            <img src="/panoramasunset-min.jpg" alt="SunsetParkPanorama" class="panorama-image">
+          </div>
+          <div class="spacer-large-desc">
+            <p><b>Food Oasis: Sunset Park 8th Avenue, 54th-57th Street.</b><br>
+              Total Supermarkets: 22, Total Restaurants: 7, Total Fast Food: 5<br>
+              <br>
+              There is an abundant and dense network of grocery vendors, along with a fair share of dining options. Though this is a fairly low income neighborhood, the availability<br>
+              of resources and the low dependency on food stamps indicates a neighborhood with sufficient access to healthy options.<br>
+            </p>
+        </div>
+        </div>
+        <div class="spacer">
+          <div class="panorama-container">
+            <img src="/panoramastarrett-min.jpg" alt="SunsetParkPanorama" class="panorama-image">
+          </div>
+          <div class="spacer-large-desc">
+            <p><b>Food Desert: Starrett City. Louisiana Avenue and Twin Pines Drive</b><br>
+              Total Supermarkets: 2, Total Restaurants: 1, Total Fast Food: 8, Total Health: 2<br>
+              <br>
+              Compared to the Sunset Park example, CH-N has a lower density of food infrastructure. However, fast food & convenience options are more plentiful compared to the supermarkets available.<br>
+              However, it is interesting to note the amount of health infrastructure around. Is this due to the higher prevalence of health problems? This implies that though there are options<br>
+              available for healthy dining, the combination of the high food stamp prevalence in this neighborhood hints at the preference of more affordable options<br>
+            </p>
+        </div>
+        </div>
+        <div class="spacer">
+          <div class="panorama-container">
+            <img src="/panoramacnh-min.jpg" alt="CnhPanorama" class="panorama-image">
+          </div>
+          <div class="spacer-large-desc">
+            <p><b>Food Swamp: Central Harlem-North. 145th Street, Bradhurst Avenue to Adam C. Powell Boulevard</b><br>
+              Total Supermarkets: 2, Total Restaurants: 1, Total Fast Food: 6, Total Health: 5<br>
+              <br>
+              Compared to the Sunset Park example, CH-N has a lower density of food infrastructure. However, fast food & convenience options are more plentiful compared to the supermarkets available.<br>
+              However, it is interesting to note the amount of health infrastructure around. Is this due to the higher prevalence of health problems? This implies that though there are options<br>
+              available for healthy dining, the combination of the high food stamp prevalence in this neighborhood hints at the preference of more affordable options<br>
+            </p>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="columns">
+      <div class="column last">
+        <div class="spacer">
+          <br>
+          <br>
+          <br>
+          <br>
+          <div class="image-container">
+            <img src="/grids2.jpg">
+          </div>
+        </div>
+      </div>
+      <div class="column first">
+        <div class="spacer-header">
+          <br>
+          <br>
+          <br>
+          <p><b>FOOD DESERT: Starrett City</b></p>
+          <br>
+        </div>
+        <div class="spacer">
+          <p>When it comes to the food infrastructure of Starrett<br>
+          City, there are only two supermarkets in the entire<br>
+          neighborhood. Outside of these supermarkets, the food<br>
+          options mostly involve fast food, dominated by chain<br>
+          establishments (i.e. Dunkin, Sarku Japan, etc.) that<br>
+          take up Starrett City's retail spaces</p>
+          <br>
+          <p>Starrett City's infrastructure is mostly apartment<br>
+          complexes, with two strip malls. The strip malls also have<br>
+          vast amounts of parking space too, which is ironic<br>
+          considering the general lack of automobile vehicle usage<br>
+          in comparison to other neighborhoods.</p>
+
+        </div>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column last">
+        <div class="spacer">
+          <div class="image-container">
+            <img src="/grids.jpg">
+          </div>
+        </div>
+      </div>
+      <div class="column first">
+        <div class="spacer-header">
+          <br>
+          <p><b>WHAT'S ON THE MENU: Central Harlem-North</b></p>
+        </div>
+        <div class="spacer">
+          <p>I want food lol</p>
+        </div>
+      </div>
+    </div>
+  <div class="columns">
+    <div class="column last">
+      <div class="spacer">
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="image-container">
+          <img src="/grids3.jpg">
+        </div>
+      </div>
+    </div>
+    <div class="column first">
+      <div class="spacer-header">
+        <br>
+        <br>
+        <br>
+        <br>
+        <p><b>WHAT'S ON THE MENU: Sunset Park</b></p>
+      </div>
+      <div class="spacer">
+        <p>I want food lol</p>
+      </div>
+    </div>
+  </div>
+  <div class="columns">
+    <div class="column first">
+      <div class="spacer">
+        <br>
+        <br>
+        <br>
+        <br>
+      </div>
+      <div class="spacer-header">
+        <b>WHAT IS THE SOLUTION?</b><br>
+        Case Study I: Food Desert, Ocean Hill
+      </div>
+      <div class="spacer">
+        <p>There are various incumbent pkaseasoeiha</p>
+      </div>
+    </div>
+    <div class="column last">
+      <div class="spacer-header">
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="image-container">
+          <div style="width: 850px; height: 650px; overflow: hidden;">
+            <iframe src="./maps/map2.html" style="width: 100%; height: 100%; border: none; transform: scale(0.9); transform-origin: 0 0;"></iframe>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+  <div class="columns">
+    <div class="column last">
+      
+    </div>
+    <div class="column first">
+      <div class="spacer-header">
+        <p><b>CONCLUSION:</b></p>
+      </div>
+      <div class="spacer">
+        <p>Food insecurity affects many neighborhoods<br>
+          in New York in different ways, whether it’s<br>
+          through lack of healthy infrastructure, or<br>
+          the inability to afford healthy options. <br>
+          Though there are many incumbent programs<br>
+          managing the food insecurity issue in the city,<br>
+          most of them reach out to a smaller clientele<br>
+          in order to maintain the quality of their<br>
+          outreach. Trying to create a one-size-fits-all<br>
+          solution that could encompass the whole city<br>
+          would not only be extremely expensive, but<br>
+          would also be unsustainable to properly feed a<br>
+          food-insecure population of over 600,000<br>
+          individuals.<br>
+        </p>
+        <br>
+        <p>Within these neighborhood-scale studies, it<br>
+          is essential to note that their respective<br>
+          infrastructures and populace are different.<br>
+          There can be cases where food insecurity<br>
+          takes the form of an area with an abundance of<br>
+          fast-food establishments and a lack of supermarket<br>
+          access. There can also be cases where food<br>
+          insecurity comes from a sparsely populated area<br>
+          with a majority senior-citizen demographic that<br>
+          have a harder time taking the trip to their local<br>
+          vendors. The simulations above show how it is<br>
+          important not to look at just one solution, but<br>
+          rather to mix and match different solutions<br>
+          that tailor the demographics and resources<br>
+          these neighborhoods have.<br>
+        </p>
+        <br>
+        <p>Ultimately, <i>Biting the Big Apple</i> is<br>
+          a stern message to NYC’s government: it has the<br>
+          responsibility of allocating these programs<br>
+          depending on what makes the most sense for these<br>
+          particular neighborhoods. This process is only a<br>
+          start, as it uses existing infrastructure– long<br>
+          term, the City has to implement permanent foundations<br>
+          in order to maintain the healing process these<br>
+          introductory interventions offer.</p>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>
+
