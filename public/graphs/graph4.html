@@ -1,124 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scatter Plot to Polygon Morph</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        svg {
-            width: 100%;
-            height: 100%;
-        }
-        .tooltip {
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.8);
-            font-family: 'Helvetica', sans-serif;
-            font-size: 12px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: none;
-        }
-    </style>
-</head>
+<meta charset="utf-8">
+<style>
+</style>
 <body>
-    <svg></svg>
-    <div class="tooltip"></div>
-    <button id="morphButton" style="position: absolute; top: 20px; left: 20px;">Morph to Polygons</button>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    // Size of SVG
+        var width = window.innerWidth;
+        var height = window.innerHeight;
 
-    <script>
-        // Load the GeoJSON data
-        d3.json("Neighborhoods_Editedv2.geojson").then(function(data) {
-            const svg = d3.select("svg"),
-                width = window.innerWidth,
-                height = window.innerHeight;
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
-            svg.attr("width", width)
-               .attr("height", height);
+var colorScale = d3.scaleSequential(d3.interpolateRdYlGn);
 
-            const projection = d3.geoMercator()
-                .fitSize([width, height], data);
-            const geoPath = d3.geoPath().projection(projection);
+d3.json("Neighborhoods_Editedv2.geojson").then(function(data) {
+  var padding = 20;
+  var projection = d3.geoAlbers()
+                    .rotate([0, 61]) // Remove rotation
+                    .fitExtent([[padding, padding], [width - padding, height - padding]], data);
 
-            // Scales for the scatter plot
-            const xScale = d3.scaleLinear()
-                .domain(d3.extent(data.features, d => d.properties.foodstampratio))
-                .range([50, width - 50]);
-            const yScale = d3.scaleLinear()
-                .domain([0, d3.max(data.features, d => d.properties.supermarket_count)])
-                .range([height - 50, 50]);
+  var incomeValues = data.features.map(function(feature) {
+    return feature.properties.averagemedianincome;
+  });
 
-            // Draw the scatter plot
-            const circles = svg.selectAll("circle")
-                .data(data.features)
-                .enter()
-                .append("circle")
-                .attr("cx", d => xScale(d.properties.foodstampratio))
-                .attr("cy", d => yScale(d.properties.supermarket_count))
-                .attr("r", 5)
-                .attr("fill", "red")
-                .style("opacity", 0.5) // Set initial opacity for circles
-                .on("mouseover", function(event, d) {
-                    d3.select(".tooltip")
-                        .style("display", "block")
-                        .style("left", `${event.pageX + 10}px`)
-                        .style("top", `${event.pageY - 10}px`)
-                        .html(`NTA Name: ${d.properties.NTAName}<br>
-                               Average Median Income: ${d.properties.averagemedianincome}<br>
-                               Supermarket Count: ${d.properties.supermarket_count}`);
+  var incomeExtent = d3.extent(incomeValues);
+  var incomeToColorValue = d3.scaleLinear()
+                             .domain(incomeExtent)
+                             .range([0, 1]);
+
+  colorScale.domain([0, 1]);
+
+  // Extract x and y values from the data
+  var xValues = data.features.map(function(feature) {
+    return feature.properties.foodstampratio;
+  });
+
+  var yValues = data.features.map(function(feature) {
+    return feature.properties.supermarket_count;
+  });
+
+
+  // Create x and y scales based on the range of values
+  var xScale = d3.scaleLinear()
+                 .domain(d3.extent(xValues))
+                 .range([padding, width - padding]);
+
+  var yScale = d3.scaleLinear()
+                 .domain(d3.extent(yValues))
+                 .range([height - padding, padding]); // Reverse y-scale to match SVG coordinates
+
+  // Create a scale for circle radius based on the range of average median income values
+  var radiusScale = d3.scaleLinear()
+                      .domain(d3.extent(incomeValues))
+                      .range([10, 2]); // Adjust the range of radii as per your preference
+
+data.features.forEach(function(feature) {
+  var x = feature.properties.foodstampratio;
+  var y = feature.properties.supermarket_count;
+  var scatterplotRadius = radiusScale(feature.properties.averagemedianincome);
+  drawDot(feature.geometry, xScale(x), yScale(y), scatterplotRadius, feature, projection);
+});
+});
+
+function drawDot(polygon, scatterplotX, scatterplotY, scatterplotRadius, feature, projection) {
+  var coordinates0 = polygon.coordinates[0].map(projection),
+      coordinates1 = circle(coordinates0, scatterplotRadius, [scatterplotX, scatterplotY]),
+      path = svg.append("path")
+                .attr("d", "M" + coordinates1.join("L") + "Z")
+                .attr("fill", function() {
+                  // Extract properties for color decision
+                  const { NTAName, foodstampindex, physindex, economicindex } = feature.properties;
+
+                  if (NTAName === "Harlem (North)") return "orange";
+                  else if (NTAName === "Spring Creek-Starrett City") return "red";
+                  else if (NTAName.trim() === "Sunset Park") return "lime"; // Ensure whitespace is trimmed
+                  else if (foodstampindex === 0) return "lightgreen";
+                  else if (foodstampindex === 1) return "yellow";
+                  else if (foodstampindex === 2 && physindex === 0) return "lightgreen";
+                  else if (foodstampindex === 2) return "pink";
+                  else if (physindex === 2 && economicindex === 1) return "pink";
+                  else return "green"; // Default color
                 })
-                .on("mouseout", function() {
-                    d3.select(".tooltip").style("display", "none");
-                });
+                .attr("stroke", "none");
 
-            // Morph to map
-            d3.select("#morphButton").on("click", function() {
-                circles.transition()
-                    .duration(2000)
-                    .attr("cx", d => geoPath.centroid(d)[0])
-                    .attr("cy", d => geoPath.centroid(d)[1])
-                    .style("opacity", 0) // Hide circles after transitioning to map locations
-                    .remove()  // Remove circles after morphing
+  path.transition()
+      .delay(1000)
+      .duration(2000)
+      .attr("d", "M" + coordinates0.join("L") + "Z");
+}
 
-                svg.selectAll("path")
-                    .data(data.features)
-                    .enter()
-                    .append("path")
-                    .attr("d", geoPath)
-                    .attr("fill", d => {
-                                // Color based on foodstampindex and physindex value
-                                const foodstampIndex = d.properties.foodstampindex;
-                                const physIndex = d.properties.physindex;
-                                const nameIndex = d.properties.NTAName;
-                                const financialIndex = d.properties.economicindex;
+function circle(coordinates, radius, centroid) {
+  var circle = [],
+      length = 0,
+      lengths = [length],
+      p0 = coordinates[0],
+      p1,
+      x,
+      y,
+      i = 0,
+      n = coordinates.length;
 
-                                if (nameIndex === "Harlem (North)") return "orange";
-                                else if (nameIndex === "Spring Creek-Starrett City") return "red";
-                                else if (nameIndex === "Sunset Park ") return "lime";
-                                else if (foodstampIndex === 0) return "lightgreen"; // Then check foodstampindex
-                                else if (foodstampIndex === 1) return "yellow";
-                                else if (foodstampIndex === 2 && physIndex === 0) return "lightgreen"; // Check physindex first
-                                else if (foodstampIndex === 2) return "pink";
-                                else if (physIndex === 2 && financialIndex === 1) return "pink";
-                                else return "green"; // Default color for undefined values
-                            })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 1)
-                    .style("opacity", 0)
-                    .transition()
-                    .duration(4000)
-                    .style("opacity", 1);  // Fade in the polygons
-            });
-        }).catch(function(error) {
-            console.error("Error loading the data: ", error);
-        });
-    </script>
+  while (++i < n) {
+    p1 = coordinates[i];
+    x = p1[0] - p0[0];
+    y = p1[1] - p0[1];
+    lengths.push(length += Math.sqrt(x * x + y * y));
+    p0 = p1;
+  }
+
+  var angleOffset = -Math.PI / 2,
+      angle,
+      i = -1,
+      k = 2 * Math.PI / lengths[lengths.length - 1];
+
+  while (++i < n) {
+     angle = angleOffset + lengths[i] * k;
+    circle.push([
+      centroid[0] + radius * Math.cos(angle),
+      centroid[1] + radius * Math.sin(angle)
+    ]);
+  }
+
+  return circle;
+}
+</script>
 </body>
-</html>

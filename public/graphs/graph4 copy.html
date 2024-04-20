@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatter Plot to Polygon Morph</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <svg></svg>
+    <div class="tooltip"></div>
+    <button id="morphButton" style="position: absolute; top: 20px; left: 20px;">Morph to Polygons</button>
+
+    <script>
+        // Load the GeoJSON data
+        d3.json("Neighborhoods_Editedv2.geojson").then(function(data) {
+            const svg = d3.select("svg"),
+                width = window.innerWidth,
+                height = window.innerHeight;
+
+            svg.attr("width", width)
+               .attr("height", height);
+
+            const projection = d3.geoMercator()
+                .fitSize([width, height], data);
+            const geoPath = d3.geoPath().projection(projection);
+
+            // Scales for the scatter plot
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(data.features, d => d.properties.foodstampratio))
+                .range([50, width - 50]);
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data.features, d => d.properties.supermarket_count)])
+                .range([height - 50, 50]);
+
+            // Draw the scatter plot
+            const circles = svg.selectAll("circle")
+                .data(data.features)
+                .enter()
+                .append("circle")
+                .attr("cx", d => xScale(d.properties.foodstampratio))
+                .attr("cy", d => yScale(d.properties.supermarket_count))
+                .attr("r", 5)
+                .attr("fill", "red")
+                .style("opacity", 0.5) // Set initial opacity for circles
+                .on("mouseover", function(event, d) {
+                    d3.select(".tooltip")
+                        .style("display", "block")
+                        .style("left", `${event.pageX + 10}px`)
+                        .style("top", `${event.pageY - 10}px`)
+                        .html(`NTA Name: ${d.properties.NTAName}<br>
+                               Average Median Income: ${d.properties.averagemedianincome}<br>
+                               Supermarket Count: ${d.properties.supermarket_count}`);
+                })
+                .on("mouseout", function() {
+                    d3.select(".tooltip").style("display", "none");
+                });
+
+            // Morph to map
+            d3.select("#morphButton").on("click", function() {
+                circles.transition()
+                    .duration(2000)
+                    .attr("cx", d => geoPath.centroid(d)[0])
+                    .attr("cy", d => geoPath.centroid(d)[1])
+                    .style("opacity", 0) // Hide circles after transitioning to map locations
+                    .remove()  // Remove circles after morphing
+
+                svg.selectAll("path")
+                    .data(data.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", geoPath)
+                    .attr("fill", d => {
+                                // Color based on foodstampindex and physindex value
+                                const foodstampIndex = d.properties.foodstampindex;
+                                const physIndex = d.properties.physindex;
+                                const nameIndex = d.properties.NTAName;
+                                const financialIndex = d.properties.economicindex;
+
+                                if (nameIndex === "Harlem (North)") return "orange";
+                                else if (nameIndex === "Spring Creek-Starrett City") return "red";
+                                else if (nameIndex === "Sunset Park ") return "lime";
+                                else if (foodstampIndex === 0) return "lightgreen"; // Then check foodstampindex
+                                else if (foodstampIndex === 1) return "yellow";
+                                else if (foodstampIndex === 2 && physIndex === 0) return "lightgreen"; // Check physindex first
+                                else if (foodstampIndex === 2) return "pink";
+                                else if (physIndex === 2 && financialIndex === 1) return "pink";
+                                else return "green"; // Default color for undefined values
+                            })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .style("opacity", 0)
+                    .transition()
+                    .duration(4000)
+                    .style("opacity", 1);  // Fade in the polygons
+            });
+        }).catch(function(error) {
+            console.error("Error loading the data: ", error);
+        });
+    </script>
+</body>
+</html>
