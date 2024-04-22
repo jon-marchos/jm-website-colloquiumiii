@@ -15,14 +15,3 @@ import confetti from "canvas-confetti";
 //   'https://www.poetryfoundation.org/poems/43262/the-bridge-to-brooklyn-bridge',
 //   { margin: 0}
 // );
-
-window.addEventListener('scroll', () => {
-    // if the user has scrolled to the bottom of the page
-    if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
-      confetti({ origin: { y: 1 }}); // move origin to bottom center
-    }
-});
-
-
-
-//d3script1
