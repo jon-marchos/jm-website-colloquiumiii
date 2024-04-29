@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D3.js Map Example</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <button id="option1Button">Option 1: Senior Citizen Program</button>
+  <button id="option2Button">Option 2: More densely-packed supermarkets</button>
+  <svg width="100vw" height="100vh"></svg>
+  <div id="totalCounts"></div>
+
+  <script>
+    // Set up the SVG
+    const svg = d3.select("svg");
+
+    // Load GeoJSON data
+    Promise.all([
+      d3.json("CHN_MapTest.geojson"),
+      d3.json("buildingsoceanhill.geojson"),
+      d3.json("streets.geojson"),
+      d3.json("cnhworship.geojson"),
+    ]).then(function(data) {
+      const oceanHillTest = data[0];
+      const buildingsOceanHill = data[1];
+      const streetOceanHill = data[2];
+      const churchOceanHill = data[3];
+
+      // Create a projection
+      const projection = d3.geoMercator()
+        .fitSize([800, 600], oceanHillTest);
+
+      // Create a path generator
+      const path = d3.geoPath().projection(projection);
+      
+      // Function to draw all map layers
+      function drawMap() {
+        // Draw oceanHillTest without choropleth shading
+        svg.selectAll(".oceanHillTest")
+          .data(oceanHillTest.features)
+          .enter().append("path")
+          .attr("class", "oceanHillTest")
+          .attr("d", path)
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.5);
+
+        // Draw buildings
+        svg.selectAll(".buildingsOceanHill")
+          .data(buildingsOceanHill.features)
+          .enter().append("path")
+          .attr("class", "buildingsOceanHill")
+          .attr("d", path)
+          .attr("fill", "lightgray")
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.5);
+
+        // Draw streets
+        svg.selectAll(".streetOceanHill")
+          .data(streetOceanHill.features)
+          .enter().append("path")
+          .attr("class", "streetOceanHill")
+          .attr("d", path)
+          .attr("stroke", "darkgray")
+          .attr("fill", "none")
+          .attr("stroke-width", 4);
+
+        // Draw churches
+        svg.selectAll(".churchOceanHill")
+          .data(churchOceanHill.features)
+          .enter().append("circle")
+          .attr("class", "churchOceanHill")
+          .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+          .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; })
+          .attr("r", 3) // Adjust the radius as needed
+          .attr("fill", "red");
+      }
+
+      // Function to calculate total count from the choropleth
+      function calculateChoroplethTotal(property) {
+        const choroplethTotal = oceanHillTest.features.reduce((total, feature) => {
+          return total + feature.properties[property];
+        }, 0);
+        return choroplethTotal;
+      }
+
+      // Function to calculate total count from 'B01001_001E' values
+      function calculateTotalPopulation() {
+        // Assuming 'B01001_001E' values are available in oceanHillTest features
+        const totalPopulation = oceanHillTest.features.reduce((total, feature) => {
+          return total + feature.properties.B01001_001E;
+        }, 0);
+        return totalPopulation;
+      }
+
+      // Function to update the total counts display
+      function updateTotalCounts(option, choroplethTotal) {
+        const totalPopulation = calculateTotalPopulation();
+        const totalCountsElement = document.getElementById("totalCounts");
+        totalCountsElement.innerHTML = `Total from Option ${option}: ${choroplethTotal}<br>% population benefitting: ${100*choroplethTotal/totalPopulation}`;
+      }
+
+      // Draw the map initially
+      drawMap();
+
+      // Button click event to trigger the creation of choropleth map for Option 1
+      document.getElementById("option1Button").addEventListener("click", function() {
+        // Calculate color scale based on the property values
+        const colorScale = d3.scaleSequential(d3.interpolateOranges)
+          .domain(d3.extent(oceanHillTest.features, d => d.properties.B11007_001E));
+
+        // Remove existing map elements
+        svg.selectAll(".oceanHillTest").remove();
+        svg.selectAll(".buildingsOceanHill").remove();
+        svg.selectAll(".streetOceanHill").remove();
+        svg.selectAll(".churchOceanHill").remove();
+
+        // Draw oceanHillTest with choropleth shading for Option 1
+        svg.selectAll(".oceanHillTest")
+          .data(oceanHillTest.features)
+          .enter().append("path")
+          .attr("class", "oceanHillTest")
+          .attr("d", path)
+          .attr("fill", d => colorScale(d.properties.B11007_001E))
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.5);
+
+        // Redraw other layers
+        drawMap();
+
+        // Update total counts display for Option 1
+        updateTotalCounts("1", calculateChoroplethTotal("B11007_001E"));
+      });
+
+      // Button click event to trigger the creation of choropleth map for Option 2
+      document.getElementById("option2Button").addEventListener("click", function() {
+        // Calculate color scale based on the property values
+        const colorScale = d3.scaleSequential(d3.interpolateBlues)
+          .domain(d3.extent(oceanHillTest.features, d => d.properties.B08014_001E));
+
+        // Remove existing map elements
+        svg.selectAll(".oceanHillTest").remove();
+        svg.selectAll(".buildingsOceanHill").remove();
+        svg.selectAll(".streetOceanHill").remove();
+        svg.selectAll(".churchOceanHill").remove();
+
+        // Draw oceanHillTest with choropleth shading for Option 2
+        svg.selectAll(".oceanHillTest")
+          .data(oceanHillTest.features)
+          .enter().append("path")
+          .attr("class", "oceanHillTest")
+          .attr("d", path)
+          .attr("fill", d => colorScale(d.properties.B08014_001E))
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.5);
+
+        // Redraw other layers
+        drawMap();
+
+        // Update total counts display for Option 2
+        updateTotalCounts("2", calculateChoroplethTotal("B08014_001E"));
+      });
+    });
+  </script>
+</body>
+</html>
