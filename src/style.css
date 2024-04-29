@@ -112,7 +112,6 @@ figcaption {
   width: calc(50% - 40px); /* Subtract twice the padding value from 50% */
   float: left;
     /* Set pointer-events to none to make the columns transparent to pointer events */
-  pointer-events: none;
   margin: 20px;
 }
 
