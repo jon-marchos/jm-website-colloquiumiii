@@ -17,9 +17,10 @@ var colorScale = d3.scaleSequential(d3.interpolateRdYlGn);
 
 d3.json("Neighborhoods_Editedv2.geojson").then(function(data) {
   var padding = 20;
-  var projection = d3.geoAlbers()
-                    .rotate([0, 61]) // Remove rotation
-                    .fitExtent([[padding, padding], [width - padding, height - padding]], data);
+  var projection = d3.geoMercator() // Change to Mercator for testing
+                    .fitSize([width, height], data);
+  
+                    var path = d3.geoPath().projection(projection);
 
   var incomeValues = data.features.map(function(feature) {
     return feature.properties.averagemedianincome;
@@ -74,8 +75,8 @@ function drawDot(polygon, scatterplotX, scatterplotY, scatterplotRadius, feature
                   const { NTAName, foodstampindex, physindex, economicindex } = feature.properties;
 
                   if (NTAName === "Harlem (North)") return "orange";
+                  else if (NTAName === "Sunset Park (Central)") return "lime"; // Ensure whitespace is trimmed
                   else if (NTAName === "Spring Creek-Starrett City") return "red";
-                  else if (NTAName.trim() === "Sunset Park") return "lime"; // Ensure whitespace is trimmed
                   else if (foodstampindex === 0) return "lightgreen";
                   else if (foodstampindex === 1) return "yellow";
                   else if (foodstampindex === 2 && physindex === 0) return "lightgreen";
