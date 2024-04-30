@@ -62,7 +62,11 @@
                 .attr("d", path)
                 .style("stroke", "black")
                 .style("fill", function(d) {
-                    return d.properties.averagemedianincome < 33714 ? "rgba(255, 0, 0, 0.25)" : "none";
+                    if (d.properties.averagemedianincome < 33714) {
+                        return "rgba(255, 0, 0, 0.25)";
+                    } else {
+                        return "rgba(0, 0, 0, 0)"; // Set fill to transparent for neighborhoods with higher income
+                    }
                 });
 
             var neighborhoodList = d3.select(".neighborhood-list")
@@ -95,39 +99,34 @@
                         .attr("y2", centroid[1]);
                 }
             });
-        // Create a scale for the population to control the height of the triangles
-        // Assuming population values range from 1000 to 100000 for scaling
-        var populationHeightScale = d3.scaleLinear()
-            .domain([1000, 100000]) // Adjust based on actual population range
-            .range([5, 50]); // Height range in pixels
 
-        data.features.forEach(function(d) {
-            if (d.properties.averagemedianincome < 33714) {
-                var centroid = path.centroid(d);
-                var population = d.properties.population;
-                var height = populationHeightScale(population)*2; // Scale the population value to determine height
+            // Create a scale for the population to control the height of the spikes
+            // Assuming foodstampprevalence values range from 0 to 100 for scaling
+            var prevalenceHeightScale = d3.scaleLinear()
+                .domain([0, 100]) // Adjust based on actual prevalence range
+                .range([5, 50]); // Height range in pixels
 
-                // Width of the triangle is constant, but height varies with population
-                var halfWidth = 3; // Half the width of the base of the triangle
-                var points = [
-                    [centroid[0] - halfWidth, centroid[1]], // Bottom left
-                    [centroid[0] + halfWidth, centroid[1]], // Bottom right
-                    [centroid[0], centroid[1] - height] // Top point, height determines how "tall" the triangle is
-                ].join(" ");
+            // data.features.forEach(function(d) {
+            //     var centroid = path.centroid(d);
+            //     var prevalence = d.properties.foodstampprevalence || 0; // Set prevalence to 0 if undefined
+            //     var height = prevalenceHeightScale(prevalence);
 
-                svg.append("polygon")
-                    .attr("points", points)
-                    .style("fill", "red") // Set the fill color of triangles
-                    .style("opacity", 0.75); // Set the opacity to 0.5
-            }
+            //     // Width of the spike is constant, but height varies with prevalence
+            //     var halfWidth = 3; // Half the width of the spike
+            //     var points = [
+            //         [centroid[0] - halfWidth, centroid[1]], // Bottom left
+            //         [centroid[0] + halfWidth, centroid[1]], // Bottom right
+            //         [centroid[0], centroid[1] - height/500] // Top point, height determines how "tall" the spike is
+            //     ].join(" ");
+
+            //     svg.append("polygon")
+            //         .attr("points", points)
+            //         .style("fill", "red") // Set the fill color of spikes
+            //         .style("opacity", 0.75); // Set the opacity to 0.5
+            // });
+        }).catch(function(error) {
+            console.log("Error loading GeoJSON data: " + error);
         });
-
-        
-    }).catch(function(error) {
-        console.log("Error loading GeoJSON data: " + error);
-    });
-
-    
     </script>
 </body>
 </html>
