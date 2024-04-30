@@ -71,9 +71,7 @@ function drawDot(polygon, scatterplotX, scatterplotY, scatterplotRadius, feature
       path = svg.append("path")
                 .attr("d", "M" + coordinates1.join("L") + "Z")
                 .attr("fill", function() {
-                  // Extract properties for color decision
                   const { NTAName, foodstampindex, physindex, economicindex } = feature.properties;
-
                   if (NTAName === "Harlem (North)") return "orange";
                   else if (NTAName === "Sunset Park (Central)") return "lime"; // Ensure whitespace is trimmed
                   else if (NTAName === "Spring Creek-Starrett City") return "red";
@@ -84,7 +82,18 @@ function drawDot(polygon, scatterplotX, scatterplotY, scatterplotRadius, feature
                   else if (physindex === 2 && economicindex === 1) return "pink";
                   else return "green"; // Default color
                 })
-                .attr("stroke", "none");
+                .attr("stroke", "white");
+
+  // Append a title for tooltip
+  path.append("title")
+      .text(function() {
+        const { NTAName, foodstampindex, physindex, economicindex } = feature.properties;
+        let status;
+        if (["orange", "yellow"].includes(path.attr("fill"))) status = "Food Desert";
+        else if (["lightgreen", "green"].includes(path.attr("fill"))) status = "Food Oasis";
+        else if (["pink"].includes(path.attr("fill"))) status = "Food Desert";
+        return `${NTAName}: ${status}`;
+      });
 
   path.transition()
       .delay(1000)

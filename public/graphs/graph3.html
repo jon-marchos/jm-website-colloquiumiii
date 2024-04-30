@@ -38,7 +38,7 @@
             top: 20px;
             right: 20px;
             font-family: 'Helvetica', sans-serif;
-            font-size: 24px; /* Increase font size */
+            font-size: 18px; /* Increase font size */
             max-width: 300px; /* Limit width */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 15px; /* Increase padding */
@@ -227,7 +227,7 @@
                .attr("transform", "translate(" + (width / 2) + " ," + (height - margin.bottom / 4) + ")")
                .style("text-anchor", "middle")
                .style("font-family", "'Helvetica', sans-serif")
-               .text("Vehicle Prevalence / Population");
+               .text("Food Stamp Prevalence / Population");
 
             // Y-axis label
             svg.append("text")
@@ -248,13 +248,13 @@
                 var cloudInfo = d3.select("#cloud-info");
                 switch (foodstampindex) {
                     case "0":
-                        cloudInfo.html("Case 1: Though there are not many supermarkets within the area, this is compensated by having access to a vehicle");
+                        cloudInfo.html("Case 1: Supermarkets are plentiful and are economically accessible");
                         break;
                     case "1":
-                        cloudInfo.html("Case 2: Though there is lower personal vehicle access, the amount of supermarkets present in the area make it manageable to get to");
+                        cloudInfo.html("Case 2: Supermarkets are present in decent numbers, but can be economically hard to access (Food Swamp)");
                         break;
                     case "2":
-                        cloudInfo.html("Case 3: As a result of lower vehicle access and supermarket counts, it is harder to access supermarkets for individuals in these neighborhoods");
+                        cloudInfo.html("Case 3: Low amount of supermarkets and also economically difficult to access (Food Desert)");
                         break;
                     default:
                         cloudInfo.html("");
@@ -265,36 +265,42 @@
                 d3.select("#cloud-info").style("display", "none");
             });
 
-                // Display NTAName for randomly selected points
-        // Display NTAName for randomly selected points with limit of 2 callouts per region
-        randomPoints.forEach(function(d) {
-        // Add spacing between point and callout
-        var spacing = 10;
+ // Define the NTA names for which we want callouts
+var specificNTANames = ["Gramercy", "Williamsburg", "Middle Village", "Flushing-Willets Point", "Chinatown-Two Bridges", "East Village", "Manhattanville-West Harlem", "Ocean Hill", "Tremont"];
 
-        // Check the region of the point
-        var foodstampindex = d.properties.foodstampindex;
+// Filter the data for points with the specified NTA names
+var specificPoints = data.features.filter(function(d) {
+    return specificNTANames.includes(d.properties.NTAName);
+});
 
-           // Track the number of callouts made from each contour region
+// Add callouts for specific points
+specificPoints.forEach(function(d) {
+    // Add spacing between point and callout
+    var spacing = 10;
+
+    // Check the region of the point
+    var foodstampindex = d.properties.foodstampindex;
+
+    // Track the number of callouts made from each contour region
     var calloutsPerRegion = {
         "0": 0,
         "1": 0,
         "2": 0
     };
 
+    // Limit to 2 callouts per region
+    if (calloutsPerRegion[foodstampindex] < 2) {
+        svg.append("text")
+           .attr("x", xScale(d.properties.foodstampratio) + spacing) // Adjust x position
+           .attr("y", yScale(d.properties.supermarket_count) - spacing) // Adjust y position
+           .text(d.properties.NTAName)
+           .style("font-family", "'Helvetica', sans-serif")
+           .style("font-size", "12px")
+           .style("fill", "black");
 
-        // Limit to 2 callouts per region
-        if (calloutsPerRegion[foodstampindex] < 2) {
-            svg.append("text")
-               .attr("x", xScale(d.properties.foodstampratio) + spacing) // Adjust x position
-               .attr("y", yScale(d.properties.supermarket_count) - spacing) // Adjust y position
-               .text(d.properties.NTAName)
-               .style("font-family", "'Helvetica', sans-serif")
-               .style("font-size", "12px")
-               .style("fill", "black");
-
-            calloutsPerRegion[foodstampindex]++;
-        }
-    });
+        calloutsPerRegion[foodstampindex]++;
+    }
+});
         }).catch(function(error) {
             console.log(error);
         });

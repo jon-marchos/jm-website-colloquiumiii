@@ -35,10 +35,10 @@
         }
         .cloud-info {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 100px;
+            right: 100px;
             font-family: 'Helvetica', sans-serif;
-            font-size: 24px; /* Increase font size */
+            font-size: 18px; /* Increase font size */
             max-width: 300px; /* Limit width */
             background-color: rgba(255, 255, 255, 0.8);
             padding: 15px; /* Increase padding */
@@ -65,9 +65,9 @@
             var height = window.innerHeight;
 
             // Margins
-            var margin = { top: 40, right: 20, bottom: 60, left: 60 };
-            var xOffset = 0.1; // Offset percentage for x-axis
-            var yOffset = 0.05; // Offset percentage for y-axis
+            var margin = { top: 40, right: 20, bottom: 60, left: 80 };
+            var xOffset = 0.05; // Offset percentage for x-axis
+            var yOffset = 0.1; // Offset percentage for y-axis
 
             // Create SVG element
             var svg = d3.select("#scatterplot")
@@ -196,8 +196,8 @@
                           .style("top", (event.pageY - 10) + "px")
                           .html("<strong>NTA Name:</strong> " + d.properties.NTAName + "<br>" +
                                 "<strong>Average Median Income:</strong> " + d.properties.averagemedianincome + "<br>" +
-                                "<strong>Supermarket Count:</strong> " + d.properties.foodburden + "<br>" +
-                                "<strong>Vehicle Ratio:</strong> " + d.properties.vehicleratio);
+                                "<strong>Food Ratio:</strong> " + d.properties.foodburden + "<br>" +
+                                "<strong>Rent Ratio:</strong> " + d.properties.rentburden);
                })
                .on("mouseout", function() {
                    d3.select(".tooltip").style("display", "none");
@@ -224,7 +224,7 @@
                .attr("transform", "translate(" + (width / 2) + " ," + (height - margin.bottom / 4) + ")")
                .style("text-anchor", "middle")
                .style("font-family", "'Helvetica', sans-serif")
-               .text("Vehicle Prevalence / Population");
+               .text("Rent % in total income");
 
             // Y-axis label
             svg.append("text")
@@ -234,7 +234,7 @@
                .attr("dy", "1em")
                .style("text-anchor", "middle")
                .style("font-family", "'Helvetica', sans-serif")
-               .text("Supermarket Count");
+               .text("Food % in total income");
             
                    // Draw red dashed line at x = 0.30
             svg.append("line")
@@ -268,7 +268,7 @@
                         cloudInfo.html("Case 1: Though there are not many supermarkets within the area, this is compensated by having access to a vehicle");
                         break;
                     case "1":
-                        cloudInfo.html("Case 2: Though there is lower personal vehicle access, the amount of supermarkets present in the area make it manageable to get to");
+                        cloudInfo.html("These neighborhoods are most prone to financial burden, as their rent and food costs greatly exceed the comfortable thresholds for their income");
                         break;
                     case "2":
                         cloudInfo.html("Case 3: As a result of lower vehicle access and supermarket counts, it is harder to access supermarkets for individuals in these neighborhoods");
