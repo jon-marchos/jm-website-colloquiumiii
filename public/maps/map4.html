@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D3.js Map Example</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    #buttonGroup {
+      margin-bottom: 10px;
+    }
+    .button {
+      margin-right: 10px;
+      background-color: #f0f0f0;
+    }
+    .button.selected {
+      background-color: lime;
+    }
+    #stressBar {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      margin-bottom: 10px;
+    }
+    .stressRect {
+      height: 100%;
+      float: left;
+    }
+    .good {
+      background-color: green;
+    }
+    .moderate {
+      background-color: yellow;
+    }
+    .heavy {
+      background-color: orange;
+    }
+    .overloaded {
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+  <svg width="80vw" height="90vh">
+    <!-- Add a group element to contain the buttons -->
+    <g id="buttonGroup" transform="translate(10, 10)"></g>
+  </svg>
+  <div id="stressMessage" style="text-align: left; font-family: Arial, Helvetica, sans-serif; margin-bottom: 5px; color: black;"></div> <!-- Message above the stress bar -->
+  <div id="stressBar">
+    <div class="stressRect"></div>
+    <div class="stressRect"></div>
+    <div class="stressRect"></div>
+    <div class="stressRect"></div>
+    <div class="stressRect"></div>
+  </div>
+  <div id="totalCounts" style="font-family: Arial, Helvetica, sans-serif"></div>
+
+  <script>
+    const svg = d3.select("svg");
+    let selectedOptions = [];
+
+    // Append buttons to the SVG
+    const buttonGroup = svg.select("#buttonGroup");
+
+    // Append buttons to the buttonGroup
+    const button1 = buttonGroup.append("foreignObject")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", 300)
+      .attr("height", 30)
+      .html('<button class="button" id="option1Button">Option 1: Senior Citizen Program</button>');
+
+    const button2 = buttonGroup.append("foreignObject")
+      .attr("x", 0)
+      .attr("y", 40)
+      .attr("width", 300)
+      .attr("height", 30)
+      .html('<button class="button" id="option2Button">Option 2: School Programs</button>');
+
+    const button3 = buttonGroup.append("foreignObject")
+      .attr("x", 0)
+      .attr("y", 80)
+      .attr("width", 300)
+      .attr("height", 30)
+      .html('<button class="button" id="option3Button">Option 3: Create new Supermarkets</button>');
+
+    const button4 = buttonGroup.append("foreignObject")
+      .attr("x", 0)
+      .attr("y", 120)
+      .attr("width", 300)
+      .attr("height", 30)
+      .html('<button class="button" id="option4Button">Option 4: Church Meal Assistance</button>');
+
+    const button5 = buttonGroup.append("foreignObject")
+      .attr("x", 0)
+      .attr("y", 160)
+      .attr("width", 300)
+      .attr("height", 30)
+      .html('<button class="button" id="option5Button">Option 5: Vacant storefront conversions</button>');
+
+    // Load GeoJSON data
+    Promise.all([
+    d3.json("chnfinal.geojson"),
+      d3.json("cnhfootprints.geojson"),
+      d3.json("streets.geojson"),
+      d3.json("cnhworship.geojson"),
+    ]).then(function(data) {
+      const oceanHillTest = data[0];
+      const buildingsOceanHill = data[1];
+      const streetOceanHill = data[2];
+      const churchOceanHill = data[3];
+
+      // Create a projection
+      const projection = d3.geoMercator()
+        .fitSize([0.9*window.innerWidth, 0.9*window.innerHeight], oceanHillTest);
+
+      // Create a path generator
+      const path = d3.geoPath().projection(projection);
+
+      // Function to draw all map layers
+      function drawMap() {
+        // Draw oceanHillTest without choropleth shading
+        svg.selectAll(".oceanHillTest")
+          .data(oceanHillTest.features)
+          .enter().append("path")
+          .attr("class", "oceanHillTest")
+          .attr("d", path)
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.5);
+
+        // Draw buildings
+        svg.selectAll(".buildingsOceanHill")
+          .data(buildingsOceanHill.features)
+          .enter().append("path")
+          .attr("class", "buildingsOceanHill")
+          .attr("d", path)
+          .attr("fill", "lightgray")
+          .attr("stroke", "gray")
+          .attr("stroke-width", 0.5);
+
+        // Draw streets
+        svg.selectAll(".streetOceanHill")
+          .data(streetOceanHill.features)
+          .enter().append("path")
+          .attr("class", "streetOceanHill")
+          .attr("d", path)
+          .attr("stroke", "darkgray")
+          .attr("fill", "none")
+          .attr("stroke-width", 4);
+
+        // Draw churches
+        svg.selectAll(".churchOceanHill")
+          .data(churchOceanHill.features)
+          .enter().append("circle")
+          .attr("class", "churchOceanHill")
+          .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+          .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; })
+          .attr("r", 3) // Adjust the radius as needed
+          .attr("fill", "red");
+      }
+
+      // Function to calculate total count from the selected options
+      function calculateTotalCounts() {
+        let totalCount = 0;
+        selectedOptions.forEach(option => {
+          if (option === 1) {
+            totalCount += calculateChoroplethTotal("B11007_001E", 1);
+          } else if (option === 2) {
+            totalCount += calculateChoroplethTotal("B14006_001E", 2);
+          } else if (option === 3) {
+            totalCount += calculateChoroplethTotal("B19058_001E", 3);
+          } else if (option === 4) {
+            totalCount += calculateChoroplethTotal("church_count", 4);
+          } else if (option === 5) {
+            totalCount += calculateChoroplethTotal("vacant_count", 5);
+          }
+        });
+        return totalCount;
+      }
+
+      function roundToNearestTenth(num) {
+    return Math.round(num * 10) / 10;
+}
+      function updateTotalCounts() {
+  const totalPopulation = calculateTotalPopulation();
+  const totalCount = calculateTotalCounts();
+  const totalCountsElement = document.getElementById("totalCounts");
+  totalCountsElement.innerHTML = `Total from Selected Options: ${totalCount}<br>% population benefitting: ${roundToNearestTenth(100 * totalCount / totalPopulation)}%`;
+
+  // Update stress bar
+  const stressBar = document.getElementById("stressBar");
+  const stressMessage = document.getElementById("stressMessage"); // Get the new status display element above the bar
+  const stressLevel = selectedOptions.length;
+  stressBar.style.width = `${stressLevel * 40}px`; // Each rectangle is 40px wide
+  if (stressLevel === 1) {
+    stressBar.className = "good";
+  } else if (stressLevel === 2) {
+    stressBar.className = "moderate";
+  } else if (stressLevel >= 3  && stressLevel <= 4) {
+    stressBar.className = "heavy";
+  } else if (stressLevel === 5) {
+    stressBar.className = "overloaded";
+  }
+  stressMessage.innerText = `Stress Level: ${stressBar.className}`; // Update the message above the bar
+}
+
+
+      // Draw the map initially
+      drawMap();
+
+// Button click event to toggle the selection of options
+function toggleOptionSelection(option, buttonId) {
+    const index = selectedOptions.indexOf(option);
+    const button = document.getElementById(buttonId);
+    if (index === -1) {
+        selectedOptions.push(option);
+        button.classList.add('selected');  // Add 'selected' class to button
+    } else {
+        selectedOptions.splice(index, 1);
+        button.classList.remove('selected');  // Remove 'selected' class from button
+    }
+}
+
+// Button click event listeners for each option
+document.getElementById("option1Button").addEventListener("click", function() {
+    toggleOptionSelection(1, "option1Button");
+    updateMapAndCounts();
+});
+
+document.getElementById("option2Button").addEventListener("click", function() {
+    toggleOptionSelection(2, "option2Button");
+    updateMapAndCounts();
+});
+
+document.getElementById("option3Button").addEventListener("click", function() {
+    toggleOptionSelection(3, "option3Button");
+    updateMapAndCounts();
+});
+
+document.getElementById("option4Button").addEventListener("click", function() {
+    toggleOptionSelection(4, "option4Button");
+    updateMapAndCounts();
+});
+
+document.getElementById("option5Button").addEventListener("click", function() {
+    toggleOptionSelection(5, "option5Button");
+    updateMapAndCounts();
+});
+
+      // Function to update map and counts
+      function updateMapAndCounts() {
+        updateMap();
+        updateTotalCounts();
+      }
+
+      // Function to update the map based on selected options
+      function updateMap() {
+        // Remove existing map elements
+        svg.selectAll(".oceanHillTest").remove();
+        svg.selectAll(".buildingsOceanHill").remove();
+        svg.selectAll(".streetOceanHill").remove();
+        svg.selectAll(".churchOceanHill").remove();
+
+        // Draw oceanHillTest with choropleth shading for selected options
+        selectedOptions.forEach(option => {
+          if (option === 1) {
+            drawChoropleth("B11007_001E", d3.interpolateOranges, 1);
+          } else if (option === 2) {
+            drawChoropleth("B14006_001E", d3.interpolateBlues, 2);
+          } else if (option === 3) {
+            drawChoropleth("B19058_001E", d3.interpolateGreens, 3);
+          } else if (option === 4) {
+            drawChoropleth("church_count", d3.interpolatePurples, 4, 100);
+          } else if (option === 5) {
+            drawChoropleth("vacant_count", d3.interpolateReds, 5, 200);
+          }
+        });
+
+        // Redraw other layers
+        drawMap();
+      }
+
+      // Function to draw choropleth for a given property
+      function drawChoropleth(property, colorInterpolator, option, multiplier = 1) {
+        // Calculate choropleth values
+        const choroplethValues = oceanHillTest.features.map(feature => {
+          if (option === 4) {
+            return feature.properties[property] * multiplier;
+          } else {
+            return feature.properties[property] / multiplier;
+          }
+        });
+
+        // Calculate color scale based on the choropleth values
+        const colorScale = d3.scaleSequential(colorInterpolator)
+          .domain(d3.extent(choroplethValues));
+
+        // Draw oceanHillTest with choropleth shading for the given property
+        svg.selectAll(".oceanHillTest")
+          .data(oceanHillTest.features)
+          .enter().append("path")
+          .attr("class", "oceanHillTest")
+          .attr("d", path)
+          .attr("fill", (d, i) => colorScale(d.properties[property] / multiplier))
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.5);
+      }
+
+      // Function to calculate total count from the choropleth
+      function calculateChoroplethTotal(property, option) {
+        const choroplethTotal = oceanHillTest.features.reduce((total, feature) => {
+          if (option === 1) {
+            return total + feature.properties[property];
+          } else if (option === 2 && feature.properties.schoolindex === 1) {
+            return total + feature.properties.B14006_001E / 2;
+          } else if (option === 3 && feature.properties.supermarketindex === 0) {
+            return total + feature.properties.B19058_001E;
+          } else if (option === 4) {
+            return total + feature.properties.church_count * 100;
+          } else if (option === 5) {
+            return total + feature.properties.vacant_count * 200;
+          } else {
+            return total;
+          }
+        }, 0);
+        return choroplethTotal;
+      }
+
+      // Function to calculate total count from 'B01001_001E' values
+      function calculateTotalPopulation() {
+        // Assuming 'B01001_001E' values are available in oceanHillTest features
+        const totalPopulation = oceanHillTest.features.reduce((total, feature) => {
+          return total + feature.properties.B01001_001E;
+        }, 0);
+        return totalPopulation;
+      }
+
+      // Initial update of total counts
+      updateTotalCounts();
+    });
+  </script>
+</body>
+</html>

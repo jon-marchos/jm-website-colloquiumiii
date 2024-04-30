@@ -11,7 +11,7 @@
     <!-- Add a group element to contain the buttons -->
     <g id="buttonGroup" transform="translate(10, 10)"></g>
   </svg>
-  <div id="totalCounts"></div>
+  <div id="totalCounts" style="font-family: Arial, Helvetica, sans-serif; padding:5px"></div>
 
   <script>
     const svg = d3.select("svg");
@@ -104,7 +104,7 @@
           .attr("d", path)
           .attr("stroke", "darkgray")
           .attr("fill", "none")
-          .attr("stroke-width", 4);
+          .attr("stroke-width", 3);
 
         // Draw churches
         svg.selectAll(".churchOceanHill")
