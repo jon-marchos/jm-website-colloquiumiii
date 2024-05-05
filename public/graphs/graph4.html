@@ -89,7 +89,7 @@ function drawDot(polygon, scatterplotX, scatterplotY, scatterplotRadius, feature
       .text(function() {
         const { NTAName, foodstampindex, physindex, economicindex } = feature.properties;
         let status;
-        if (["orange", "yellow"].includes(path.attr("fill"))) status = "Food Desert";
+        if (["orange", "yellow"].includes(path.attr("fill"))) status = "Food Swamp";
         else if (["lightgreen", "green"].includes(path.attr("fill"))) status = "Food Oasis";
         else if (["pink"].includes(path.attr("fill"))) status = "Food Desert";
         return `${NTAName}: ${status}`;
