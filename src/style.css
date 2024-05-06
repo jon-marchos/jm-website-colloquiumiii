@@ -161,6 +161,7 @@ figcaption {
   }
   .column {
     width: 100%;
+    margin: 0.3vw;
   }
 
   .first {
@@ -293,3 +294,7 @@ figure p {
 .background-content iframe {
   pointer-events: all; /* Allow pointer events for elements within the iframe */
 }
+
+/* .add-left-padding {
+  margin: 0.5rem;
+} */
