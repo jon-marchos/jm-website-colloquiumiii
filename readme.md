@@ -1,19 +1,3 @@
-## Web Workshop I
+## Biting the Big Apple
 
-### Installation
-
-```
-$ npm install
-```
-
-### Develop
-
-```
-$ npm run dev
-```
-
-### Build
-
-```
-$ npm run build
-```
+###MD coming soon
